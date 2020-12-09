@@ -1,5 +1,7 @@
 import os
 import smtplib
+import imaplib
+import email
 import random
 from email.message import EmailMessage
 
@@ -47,6 +49,31 @@ for e in emails:
         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         # send the email
         smtp.send_message(email)
+        # report
+        print("Mail sent to: " + people[emails.index(e)])
+
+        smtp.quit()
+
+# delete sent emails to maintain full autonomous
+imap = imaplib.IMAP4_SSL("imap.gmail.com")
+imap.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+imap.select('"[Gmail]/Sent Mail"')
+status, mails = imap.search(None, 'SUBJECT "The Person You Will Gift To Is......."')
+mails = mails[0].split(b' ')
+for mail in mails:
+    print("Deleting: " + mail.decode())
+    imap.store(mail, "+FLAGS", "\\Deleted")
+# permanantly delete all flagged deleted
+imap.expunge()
+imap.close()
+imap.logout()
+
+
+
+""" TO CHECK DIFFERENT MAILBOX 
+for i in mail.list()[1]:
+    print(i)
+"""
 
 """ TEMPLATE 
 # form email information
